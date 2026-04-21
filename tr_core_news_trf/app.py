@@ -25,7 +25,8 @@ def render_ui():
     Main function to configure and render the Streamlit UI for the spaCy model.
     """
     # The path to the local assembled and packaged model
-    models = ["models/tr_core_news_trf-3.4.2"]
+    #models = ["models/tr_core_news_trf-3.4.2"]
+    models = ["tr_core_news_trf-3.4.2"]
     
     # A default Turkish text snippet to test NER, dependencies, and POS tagging out of the box
     default_text = (

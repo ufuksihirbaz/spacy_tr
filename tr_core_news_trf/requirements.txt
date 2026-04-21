@@ -1,0 +1,14 @@
+# Primary Purpose: 
+#     List the Python dependencies required to run the Streamlit NLP visualizer.
+#
+# Core Logic/Components:
+#     - spacy: Core NLP library.
+#     - spacy-streamlit: Streamlit components for spaCy.
+#     - [Model URL]: Placeholder for the custom Turkish transformer model wheel.
+#
+# Broader Application:
+#     Used by Streamlit Community Cloud (or any pip environment) to automatically 
+#     install the environment needed to run app.py.
+
+spacy-streamlit
+https://github.com/ufuksihirbaz/spacy_tr/releases/download/Spacy/tr_core_news_trf-3.4.2-py3-none-any.whl
