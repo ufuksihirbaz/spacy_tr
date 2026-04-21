@@ -1,0 +1,91 @@
+preprocess_ud:
+  cmd: python -m weasel run preprocess_ud
+  script:
+    - mkdir -p corpus/BOUN
+    - spacy convert ../datasets/UD/UD_Turkish-BOUN/tr_boun-ud-train.conllu corpus/BOUN  --converter
+      conllu --n-sents 10 --merge-subtokens
+    - spacy convert ../datasets/UD/UD_Turkish-BOUN/tr_boun-ud-test.conllu  corpus/BOUN
+      --converter conllu --n-sents 10 --merge-subtokens
+    - spacy convert ../datasets/UD/UD_Turkish-BOUN/tr_boun-ud-dev.conllu  corpus/BOUN
+      --converter conllu --n-sents 10 --merge-subtokens
+  deps:
+    - path: ../datasets/UD/UD_Turkish-BOUN/tr_boun-ud-train.conllu
+      md5: 3c299f7c3f4e8d805ff56e0c582327ba
+    - path: ../datasets/UD/UD_Turkish-BOUN/tr_boun-ud-test.conllu
+      md5: 671f9c42c7a23d0c11843855a0b86588
+    - path: ../datasets/UD/UD_Turkish-BOUN/tr_boun-ud-dev.conllu
+      md5: 8100507c12723495f04edc69fa778900
+  outs:
+    - path: corpus/BOUN/tr_boun-ud-train.spacy
+      md5: 41ef6093697888503c8401508a8979d9
+    - path: corpus/BOUN/tr_boun-ud-test.spacy
+      md5: bb7df27343647ce2b80a36dc094c5db7
+    - path: corpus/BOUN/tr_boun-ud-dev.spacy
+      md5: 21bfb19c0c08e0f509ca3d518737775c
+preprocess_ner:
+  cmd: python -m weasel run preprocess_ner
+  script:
+    - mkdir -p corpus/NER
+    - bash -c 'cat ../datasets/NER/XTREME/train.conll ../datasets/NER/TNEWSNER/train.conll
+      > corpus/NER/train.conll'
+    - bash -c 'cat ../datasets/NER/XTREME/dev.conll ../datasets/NER/TNEWSNER/dev.conll
+      > corpus/NER/dev.conll'
+    - bash -c 'cat ../datasets/NER/XTREME/test.conll ../datasets/NER/TNEWSNER/test.conll
+      > corpus/NER/test.conll'
+    - spacy convert corpus/NER/train.conll corpus/NER --converter ner --n-sents 10
+    - spacy convert corpus/NER/dev.conll corpus/NER --converter ner --n-sents 10
+    - spacy convert corpus/NER/test.conll corpus/NER --converter ner --n-sents 10
+  deps:
+    - path: ../datasets/NER/XTREME/train.conll
+      md5: 866fa86f16c7845630d37fb785ec257e
+    - path: ../datasets/NER/XTREME/test.conll
+      md5: b3b53636850629b78d996bb6979e1f6b
+    - path: ../datasets/NER/XTREME/dev.conll
+      md5: e6c7ee7e677f915762080bb6ed8f397f
+    - path: ../datasets/NER/TNEWSNER/train.conll
+      md5: 1c4112599e9e99d5e6c1fc85262f8d9a
+    - path: ../datasets/NER/TNEWSNER/test.conll
+      md5: aad8ca25f4f5d91f301d1ebb91f6bae5
+    - path: ../datasets/NER/TNEWSNER/dev.conll
+      md5: c9888379a4cb910bfcf55a8ef2cd535c
+  outs:
+    - path: corpus/NER/train.conll
+      md5: 662171a7c44d1ac0a1bfb6f56c0ad659
+    - path: corpus/NER/dev.conll
+      md5: 1e54372587224bdce7eb43155e134c31
+    - path: corpus/NER/test.conll
+      md5: e36a4c0b647b03aa3ff46f17d4c7d18f
+    - path: corpus/NER/train.spacy
+      md5: 97aceb073d32f3473c393410b9f38306
+    - path: corpus/NER/dev.spacy
+      md5: 9e4edea7f7d5fb27fa3dd25e1c78337e
+    - path: corpus/NER/test.spacy
+      md5: f0ce61473966b84567b88ca42476a9e5
+assemble:
+  cmd: python -m weasel run assemble
+  script:
+    - spacy assemble configs/assemble.cfg models/tr_core_news_trf-3.4.2 --paths.tagger_model
+      training/BOUN/model-best --paths.ner_model training/NER/model-best
+  deps:
+    - path: training/BOUN/model-best
+      md5: 2eb399a4c93b6b5f9871325ca5028ea6
+    - path: training/NER/model-best
+      md5: 8edcf8abdc87009f8c161d48c3177406
+  outs:
+    - path: models/tr_core_news_trf-3.4.2
+      md5: b4ae8f5d475787d197ca8003521408a9
+package:
+  cmd: python -m weasel run package
+  script:
+    - spacy package models/tr_core_news_trf-3.4.2 packages --build 'wheel' --meta
+      meta.json --name core_news_trf --version 3.4.2 --force
+  deps:
+    - path: models/tr_core_news_trf-3.4.2
+      md5: b4ae8f5d475787d197ca8003521408a9
+    - path: meta.json
+      md5: 69c297aa112c460d5b9199e8e79cb0ec
+  outs:
+    - path: packages/tr_core_news_trf-3.4.2/dist/tr_core_news_trf-3.4.2-py3-none-any.whl
+      md5: a505e5d222c511600abd2e46b86a0f63
+    - path: packages/tr_core_news_trf-3.4.2/tr_core_news_trf/tr_core_news_trf-3.4.2
+      md5: dc771c0bba3630329808bdda56a3c0b8
